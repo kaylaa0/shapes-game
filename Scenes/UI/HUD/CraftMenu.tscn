@@ -1,0 +1,827 @@
+[gd_scene load_steps=26 format=3 uid="uid://bg7ecar0qu5j1"]
+
+[ext_resource type="Script" path="res://Scripts/UI/HUD/CraftMenu.gd" id="1"]
+[ext_resource type="Script" path="res://Scripts/UI/HUD/ScrollContainer.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://clrhwk4v6ixt5" path="res://Textures/ui/objects/hud/CraftMenuDown.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://b6oinpffuhpoa" path="res://Textures/ui/objects/hud/CraftMenuUp.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://bdy1jx41ggbo5" path="res://Textures/ui/objects/frame.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://do42cowrq477r" path="res://Textures/ui/objects/hud/CraftMenuLock.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://bt4p2021x08cq" path="res://Textures/ui/objects/hud/CraftMenuUnlock.png" id="8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wyvmi"]
+bg_color = Color(0.372549, 0.541176, 0.462745, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+
+[sub_resource type="StyleBoxFlat" id="3"]
+bg_color = Color(0.607843, 0.686275, 1, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(0.607843, 0.686275, 1, 1)
+border_blend = true
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="4"]
+bg_color = Color(0.607843, 0.745098, 1, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(0.607843, 0.745098, 1, 1)
+border_blend = true
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="5"]
+bg_color = Color(0.686275, 0.784314, 1, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(0.686275, 0.784314, 1, 1)
+border_blend = true
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="StyleBoxFlat" id="6"]
+bg_color = Color(1, 1, 0, 1)
+border_width_left = 5
+border_width_top = 15
+border_width_right = 5
+border_width_bottom = 15
+border_color = Color(1, 1, 0, 0)
+border_blend = true
+
+[sub_resource type="StyleBoxFlat" id="7"]
+bg_color = Color(1, 1, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+border_blend = true
+corner_detail = 5
+
+[sub_resource type="Theme" id="8"]
+VScrollBar/icons/decrement = null
+VScrollBar/icons/decrement_highlight = null
+VScrollBar/icons/increment = null
+VScrollBar/icons/increment_highlight = null
+VScrollBar/styles/grabber = SubResource("3")
+VScrollBar/styles/grabber_highlight = SubResource("4")
+VScrollBar/styles/grabber_pressed = SubResource("5")
+VScrollBar/styles/scroll = SubResource("6")
+VScrollBar/styles/scroll_focus = SubResource("7")
+
+[sub_resource type="GDScript" id="9"]
+script/source = "extends Button
+
+var buttonStyleHover = StyleBoxFlat.new()
+var buttonStylePressed = StyleBoxFlat.new()
+var buttonStyleNormal = StyleBoxFlat.new()
+
+var craftableButtonStyleHover = StyleBoxFlat.new()
+var craftableButtonStylePressed = StyleBoxFlat.new()
+var craftableButtonStyleNormal = StyleBoxFlat.new()
+
+func _ready():
+# warning-ignore:return_value_discarded
+	GameManager.get_player().connect(\"cmbUpdateNeeded\",Callable(self,\"update_content_forced\"))
+	generate_style_boxes()
+	darken_button()
+
+func select_update(name:String, from:String)->void:
+	if(from == \"bar\"):
+		if(get_parent().get_node(\"MarginContainer/TextureButton\").is_pressed()):
+			return
+		else:
+			GameManager.get_player().set_selected_craftable(name)
+	elif(from == \"grid\"):
+		GameManager.get_player().set_selected_craftable(name)
+		get_parent().get_node(\"Popup\").hide()
+	else:
+		print_debug(\"Undefined type for select_update of CraftMenu main Button: \"+from)
+
+func update_content_forced():
+	for node in self.get_children():
+		node.queue_free()
+	var dummyCraftable:MyCraftable = GameManager.get_player().get_next_craftables()[GameManager.get_player().get_selected_craftable()].duplicate()
+# warning-ignore:return_value_discarded
+	dummyCraftable.connect(\"valueset\",Callable(self,\"update_needed\"))
+	dummyCraftable.to_simpleton()
+	dummyCraftable.set_position(Vector2(50,50))
+	dummyCraftable.set_scale(Vector2(0.01,0.01))
+	self.add_child(dummyCraftable)
+
+func update_content(from:String):
+	if(from == \"bar\"):
+		if(get_parent().get_node(\"MarginContainer/TextureButton\").is_pressed()):
+			return
+		else:
+			update_content_forced()
+	elif(from == \"grid\"):
+		update_content_forced()
+	else:
+		print_debug(\"Undefined type for update_content of CraftMenu main Button: \"+from)
+
+func _on_Button_toggled(button_pressed):
+
+	if(button_pressed):
+		if(!get_parent().get_node(\"Popup\").is_visible()):
+			get_parent().get_node(\"Popup\").resize_fit()
+			get_parent().get_node(\"Popup\").popup(Rect2(Vector2(-25 + self.get_global_position().x - get_parent().get_node(\"Popup/GridMargin/GridContainer\").get_size().x+100,
+												-20 + self.get_global_position().y - 45
+												-get_parent().get_node(\"Popup/GridMargin/GridContainer\").get_size().y),
+				get_parent().get_node(\"Popup/GridMargin/GridContainer\").get_size()
+				+Vector2(50,22)
+				))
+	else:
+		return
+
+func lighten_button():
+	self.add_theme_stylebox_override('hover', craftableButtonStyleHover)
+	self.add_theme_stylebox_override('pressed', craftableButtonStylePressed)
+	self.add_theme_stylebox_override('normal', craftableButtonStyleNormal)
+
+
+func darken_button():
+	self.add_theme_stylebox_override('hover', buttonStyleHover)
+	self.add_theme_stylebox_override('pressed', buttonStylePressed)
+	self.add_theme_stylebox_override('normal', buttonStyleNormal)
+
+
+func update_needed():
+	if GameManager.get_player().get_next_craftables()[GameManager.get_player().get_selected_craftable()].get_can_craft():
+		lighten_button()
+	else:
+		darken_button()
+	self.update_content_forced()
+	
+
+func isMouseOver()->bool:
+	if get_rect().has_point(get_global_mouse_position()-self.get_global_position()):
+		return true
+	else:
+		return false
+
+func toggle_signal()->void:
+	self.set_pressed(false)
+
+func generate_style_boxes():
+	buttonStyleHover.set_bg_color(Color(\"#50383838\"))
+	buttonStyleHover.set_corner_radius_all(10)
+	buttonStylePressed.set_bg_color(Color(\"#1e3c3c3c\"))
+	buttonStylePressed.set_corner_radius_all(10)
+	buttonStyleNormal.set_bg_color(Color(\"#64323232\"))
+	buttonStyleNormal.set_corner_radius_all(10)
+	craftableButtonStyleHover.set_bg_color(Color(\"#504f4f4f\"))
+	craftableButtonStyleHover.set_corner_radius_all(10)
+	craftableButtonStylePressed.set_bg_color(Color(\"#1e979797\"))
+	craftableButtonStylePressed.set_corner_radius_all(10)
+	craftableButtonStyleNormal.set_bg_color(Color(\"#645e5e5e\"))
+	craftableButtonStyleNormal.set_corner_radius_all(10)
+"
+
+[sub_resource type="GDScript" id="10"]
+script/source = "extends Popup
+
+@onready var bar:GridContainer = get_node(\"GridMargin/GridContainer\")
+var buttonStyleHover = StyleBoxFlat.new()
+var buttonStylePressed = StyleBoxFlat.new()
+var buttonStyleFocus = StyleBoxEmpty.new()
+var buttonStyleDisable = StyleBoxFlat.new()
+var buttonStyleNormal = StyleBoxFlat.new()
+
+var craftableButtonStyleHover = StyleBoxFlat.new()
+var craftableButtonStylePressed = StyleBoxFlat.new()
+var craftableButtonStyleFocus = StyleBoxEmpty.new()
+var craftableButtonStyleDisable = StyleBoxFlat.new()
+var craftableButtonStyleNormal = StyleBoxFlat.new()
+
+var craftMenuButtonScript = load(\"res://Scripts/UI/HUD/CraftMenuSelectButton.gd\")
+
+var animInit:bool = false
+var textureInit:bool = false
+
+@onready var animationPlayer = get_node(\"AnimationPlayer\")
+var animationName:String
+
+var forceHide:bool = false
+
+@onready var marginValue:Vector2 = Vector2(40,70)
+
+@onready var mainButton:Button = get_parent().get_node(\"Button\")
+signal updateMainSignal(mode)
+signal selectUpdateSignal(name, mode)
+signal buttonToggleSignal()
+
+func _ready():
+	animationName = str(self.get_name())+\" \"+str(self.get_instance_id())
+# warning-ignore:return_value_discarded
+	connect(\"updateMainSignal\",Callable(mainButton,\"update_content\"))
+# warning-ignore:return_value_discarded
+	connect(\"selectUpdateSignal\",Callable(mainButton,\"select_update\"))
+# warning-ignore:return_value_discarded
+	connect(\"buttonToggleSignal\",Callable(mainButton,\"toggle_signal\"))
+	
+	generate_style_boxes()
+	
+func init_craftable(craftable:MyCraftable)->void:
+	var control = Control.new()
+	control.set_custom_minimum_size(Vector2(80,80))
+	control.set_name(craftable.get_name())
+	control.set_mouse_filter(2) #MOUSE_FILTER_IGNORE
+	var button = create_select_button(craftable.get_name())
+	control.add_child(button)
+	bar.add_child(control)
+
+func create_select_button(craftableName:String)->Button:
+	var button = set_style_boxes(Button.new())
+	button.set_custom_minimum_size(Vector2(70,70))
+	button.set_position(Vector2(5,5))
+	button.set_name(craftableName+\" button\")
+	button.set_mouse_filter(1) # MOUSE_FILTER_PASS 
+	button.set_focus_mode(0)
+	#button.set_flat(false)
+	button.set_script(craftMenuButtonScript)
+	button.connect(\"updateNeeded\",Callable(self,\"update_main_content\"))
+	button.connect(\"selectUpdate\",Callable(self,\"update_select\"))
+	button.request_ready()
+	return button
+
+func add_to_bar(craftableName:String, craftable:MyCraftable)->void:
+	for child in bar.get_children():
+		if child.get_name() == craftableName:
+			bar.get_node(craftableName).add_child(craftable)
+			bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+			return
+	print_debug(\"Can not find place in bar to add craftable: \"+craftableName)
+
+func update_at_bar(craftableName:String, craftable:MyCraftable, state:bool)->void:
+	for child in bar.get_children():
+		if child.get_name() == craftableName:
+			bar.get_node(craftableName).add_child(craftable)
+			if state:
+# warning-ignore:return_value_discarded
+				set_style_craftable(bar.get_node(craftableName+\"/\"+craftableName+\" button\"))
+			elif !state:
+# warning-ignore:return_value_discarded
+				set_style_boxes(bar.get_node(craftableName+\"/\"+craftableName+\" button\"))
+			return
+	print_debug(\"Can not find place in bar to update craftable: \"+craftableName)
+
+func update_main_content(): # For updating selected button.
+	emit_signal(\"updateMainSignal\", \"grid\")
+
+func update_content(craftable, state)->void: # For updating inside all of one button. Used to sync craftability state.
+	var craftableName = craftable.get_name()
+	clear_contents(craftableName)
+	var dummyCraftable:MyCraftable = GameManager.get_player().get_next_craftables()[craftableName].duplicate()
+	dummyCraftable.to_simpleton()
+	dummyCraftable.set_position(Vector2(40,40))
+	dummyCraftable.set_scale(Vector2(0.01,0.01))
+	update_at_bar(craftableName, dummyCraftable, state)
+
+func resize_fit():
+	for child in get_children():
+		if child.get_name() == \"GridMargin\"||child.get_name() == \"AnimationPlayer\":
+			continue
+		else:
+			child.set_size(Vector2(get_node(\"GridMargin\").get_size()[0],child.get_size()[1]))
+
+func update_contents(): # For updating inside all the buttons.
+	update_main_content()
+	for craftableName in GameManager.get_player().get_next_craftables().keys():
+		clear_contents(craftableName)
+		var dummyCraftable:MyCraftable = GameManager.get_player().get_next_craftables()[craftableName].duplicate()
+		dummyCraftable.to_simpleton()
+		dummyCraftable.set_position(Vector2(40,40))
+		dummyCraftable.set_scale(Vector2(0.01,0.01))
+		add_to_bar(craftableName, dummyCraftable)
+
+func clear_contents(craftableName:String)->void:
+	for child in bar.get_children():
+		if child.has_node(craftableName+\" button\"):
+			for child2 in child.get_children():
+				if child2.get_name() != craftableName+\" button\":
+					child2.queue_free()
+			return
+	print_debug(\"Can not find craftable to clear in clear contents: \"+craftableName)
+
+func update_select(name:String)->void:
+	emit_signal(\"selectUpdateSignal\", name, \"grid\")
+
+func set_style_craftable(button:Button)->Button:
+	button.add_theme_stylebox_override('hover', craftableButtonStyleHover)
+	button.add_theme_stylebox_override('pressed', craftableButtonStylePressed)
+	button.add_theme_stylebox_override('focus', craftableButtonStyleFocus)
+	button.add_theme_stylebox_override('disable', craftableButtonStyleDisable)
+	button.add_theme_stylebox_override('normal', craftableButtonStyleNormal)
+	return button
+
+func set_style_boxes(button:Button)->Button:
+	button.add_theme_stylebox_override('hover', buttonStyleHover)
+	button.add_theme_stylebox_override('pressed', buttonStylePressed)
+	button.add_theme_stylebox_override('focus', buttonStyleFocus)
+	button.add_theme_stylebox_override('disable', buttonStyleDisable)
+	button.add_theme_stylebox_override('normal', buttonStyleNormal)
+	return button
+
+func generate_style_boxes():
+	buttonStyleHover.set_bg_color(Color(\"#2c2e2e2e\"))
+	buttonStyleHover.set_corner_radius_all(5)
+	buttonStylePressed.set_bg_color(Color(\"#2c3b3b3b\"))
+	buttonStylePressed.set_corner_radius_all(5)
+	buttonStyleDisable.set_bg_color(Color(\"#0f0f0f\"))
+	buttonStyleDisable.set_corner_radius_all(4)
+	buttonStyleNormal.set_bg_color(Color(\"#2c272727\"))
+	buttonStyleNormal.set_corner_radius_all(5)
+	craftableButtonStyleHover.set_bg_color(Color(\"#2ceaeaea\"))
+	craftableButtonStyleHover.set_corner_radius_all(5)
+	craftableButtonStylePressed.set_bg_color(Color(\"#2cffffff\"))
+	craftableButtonStylePressed.set_corner_radius_all(5)
+	craftableButtonStyleDisable.set_bg_color(Color(\"#2c0f0f\"))
+	craftableButtonStyleDisable.set_corner_radius_all(4)
+	craftableButtonStyleNormal.set_bg_color(Color(\"#2cafafaf\"))
+	craftableButtonStyleNormal.set_corner_radius_all(5)
+
+
+func _on_Popup_about_to_show():
+	if(textureInit == false):
+		texture_init()
+	if(animInit == false):
+		anim_init()
+	animationPlayer.play(animationName)
+
+func texture_init()->void:
+	get_node(\"B1\").set_size(get_node(\"GridMargin/GridContainer\").get_size()+marginValue)
+	get_node(\"B2\").set_size(get_node(\"GridMargin/GridContainer\").get_size()+marginValue)
+	get_node(\"B3\").set_size(get_node(\"GridMargin/GridContainer\").get_size()+marginValue)
+	get_node(\"MarginContainer\").set_size(get_node(\"GridMargin/GridContainer\").get_size()+marginValue)
+	self.textureInit = true
+
+func anim_init()->void:
+	var animation = Animation.new()
+	for childName in [\"B1\", \"B2\", \"B3\", \"MarginContainer\", \"GridMargin\"]:
+		var track_index = animation.add_track(Animation.TYPE_VALUE)
+		animation.track_set_path(track_index, childName+\":position\")
+		animation.set_length(0.3)
+		animation.track_insert_key(track_index, 0.3, self.get_position())
+		animation.track_insert_key(track_index, 0.00, Vector2(self.get_position().x, self.get_position().y+get_node(\"MarginContainer\").get_size().y))
+		animation.track_insert_key(track_index, 0.2, Vector2(self.get_position().x, self.get_position().y+self.get_size().y))
+	var animationLibrary
+	if !animationPlayer.has_animation_library(self.get_name()):
+		animationLibrary = AnimationLibrary.new()
+		animationLibrary.add_animation(animationName, animation)
+		animationPlayer.add_animation_library(self.get_name(), animationLibrary)
+	else:
+		animationPlayer.get_animation_library(self.get_name()).add_animation(animationName, animation)
+	animInit = true
+
+
+func force_hide():
+	self.popup()
+	animationPlayer.play_backwards(animationName)
+	await animationPlayer.animation_finished
+	emit_signal(\"buttonToggleSignal\")
+
+
+func _on_Popup_popup_hide():
+	if forceHide:
+		forceHide = false
+		return
+	else:
+		forceHide = true
+		force_hide()
+"
+
+[sub_resource type="Shader" id="11"]
+code = "shader_type canvas_item;
+
+// Which color you want to change
+uniform vec4 u_color_key : source_color;
+// Which color to replace it with
+uniform vec4 u_replacement_color : source_color;
+// How much tolerance for the replacement color (between 0 and 1)
+uniform float u_tolerance;
+
+void fragment() {
+    // Get color from the sprite texture at the current pixel we are rendering
+    vec4 original_color = texture(TEXTURE, UV);
+    vec3 col = original_color.rgb;
+    // Get a rough degree of difference between the texture color and the color key
+    vec3 diff3 = col - u_color_key.rgb;
+    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+    float brightness = length(col);
+    col = mix(col, u_replacement_color.rgb * brightness, step(m, u_tolerance));
+    // Assign final color for the pixel, and preserve transparency
+    COLOR = vec4(col.rgb, original_color.a);
+}"
+
+[sub_resource type="ShaderMaterial" id="12"]
+shader = SubResource("11")
+shader_parameter/u_color_key = Color(1, 1, 1, 1)
+shader_parameter/u_replacement_color = Color(0, 0.368627, 1, 0)
+shader_parameter/u_tolerance = null
+
+[sub_resource type="Shader" id="13"]
+code = "shader_type canvas_item;
+
+// Which color you want to change
+uniform vec4 u_color_key : source_color;
+// Which color to replace it with
+uniform vec4 u_replacement_color : source_color;
+// How much tolerance for the replacement color (between 0 and 1)
+uniform float u_tolerance;
+
+void fragment() {
+    // Get color from the sprite texture at the current pixel we are rendering
+    vec4 original_color = texture(TEXTURE, UV);
+    vec3 col = original_color.rgb;
+    // Get a rough degree of difference between the texture color and the color key
+    vec3 diff3 = col - u_color_key.rgb;
+    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+    float brightness = length(col);
+    col = mix(col, u_replacement_color.rgb * brightness, step(m, u_tolerance));
+    // Assign final color for the pixel, and preserve transparency
+    COLOR = vec4(col.rgb, original_color.a);
+}"
+
+[sub_resource type="ShaderMaterial" id="14"]
+shader = SubResource("13")
+shader_parameter/u_color_key = Color(1, 1, 1, 1)
+shader_parameter/u_replacement_color = Color(1, 0.380392, 0.054902, 0)
+shader_parameter/u_tolerance = null
+
+[sub_resource type="Shader" id="15"]
+code = "shader_type canvas_item;
+
+// Which color you want to change
+uniform vec4 u_color_key : source_color;
+// Which color to replace it with
+uniform vec4 u_replacement_color : source_color;
+// How much tolerance for the replacement color (between 0 and 1)
+uniform float u_tolerance;
+
+void fragment() {
+    // Get color from the sprite texture at the current pixel we are rendering
+    vec4 original_color = texture(TEXTURE, UV);
+    vec3 col = original_color.rgb;
+    // Get a rough degree of difference between the texture color and the color key
+    vec3 diff3 = col - u_color_key.rgb;
+    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+    float brightness = length(col);
+    col = mix(col, u_replacement_color.rgb * brightness, step(m, u_tolerance));
+    // Assign final color for the pixel, and preserve transparency
+    COLOR = vec4(col.rgb, original_color.a);
+}"
+
+[sub_resource type="ShaderMaterial" id="16"]
+shader = SubResource("15")
+shader_parameter/u_color_key = Color(1, 1, 1, 1)
+shader_parameter/u_replacement_color = Color(0.780392, 0.254902, 0.498039, 0)
+shader_parameter/u_tolerance = null
+
+[sub_resource type="Shader" id="17"]
+code = "shader_type canvas_item;
+
+// Which color you want to change
+uniform vec4 u_color_key : source_color;
+// Which color to replace it with
+uniform vec4 u_unlock_replacement_color : source_color;
+// Which color to replace it with
+uniform vec4 u_lock_replacement_color : source_color;
+// How much tolerance for the replacement color (between 0 and 1)
+uniform float u_tolerance;
+
+uniform bool isPressed;
+
+void fragment() {
+	if(isPressed){
+		// Get color from the sprite texture at the current pixel we are rendering
+	    vec4 original_color = texture(TEXTURE, UV);
+	    vec3 col = original_color.rgb;
+	    // Get a rough degree of difference between the texture color and the color key
+	    vec3 diff3 = col - u_color_key.rgb;
+	    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+	    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+	    float brightness = length(col);
+	    col = mix(col, u_lock_replacement_color.rgb * brightness, step(m, u_tolerance));
+	    // Assign final color for the pixel, and preserve transparency
+	    COLOR = vec4(col.rgb, original_color.a);
+    }else{// Get color from the sprite texture at the current pixel we are rendering
+	    vec4 original_color = texture(TEXTURE, UV);
+	    vec3 col = original_color.rgb;
+	    // Get a rough degree of difference between the texture color and the color key
+	    vec3 diff3 = col - u_color_key.rgb;
+	    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+	    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+	    float brightness = length(col);
+	    col = mix(col, u_unlock_replacement_color.rgb * brightness, step(m, u_tolerance));
+	    // Assign final color for the pixel, and preserve transparency
+	    COLOR = vec4(col.rgb, original_color.a);
+		}
+}"
+
+[sub_resource type="ShaderMaterial" id="18"]
+shader = SubResource("17")
+shader_parameter/u_color_key = Color(1, 1, 1, 0.392157)
+shader_parameter/u_unlock_replacement_color = Color(1, 0.376471, 0.376471, 0.392157)
+shader_parameter/u_lock_replacement_color = Color(0.443137, 1, 0.411765, 0.392157)
+shader_parameter/u_tolerance = 5.0
+shader_parameter/isPressed = false
+
+[sub_resource type="GDScript" id="19"]
+script/source = "extends TextureButton
+
+
+func _ready():
+	pass
+
+func isMouseOver()->bool:
+	if get_rect().has_point(get_global_mouse_position()-self.get_global_position()):
+		return true
+	else:
+		return false
+
+# warning-ignore:unused_argument
+func _on_TextureButton_toggled(button_pressed):
+	self.material.set_shader_parameter(\"isPressed\",self.is_pressed()) # Replace with function body.
+"
+
+[node name="CraftMenu" type="MarginContainer"]
+custom_minimum_size = Vector2(700, 100)
+offset_right = 736.0
+offset_bottom = 150.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+script = ExtResource("1")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_wyvmi")
+
+[node name="CraftMenuMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HSplitContainer" type="HSplitContainer" parent="CraftMenuMargin"]
+layout_mode = 2
+dragger_visibility = 1
+
+[node name="HSplitContainer" type="HSplitContainer" parent="CraftMenuMargin/HSplitContainer"]
+layout_mode = 2
+split_offset = 600
+collapsed = true
+dragger_visibility = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="CraftMenuMargin/HSplitContainer/HSplitContainer"]
+custom_minimum_size = Vector2(548, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+theme = SubResource("8")
+horizontal_scroll_mode = 0
+script = ExtResource("2")
+
+[node name="GridContainer" type="GridContainer" parent="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer/ScrollContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/v_separation = 0
+columns = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="Up" type="TextureButton" parent="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(25, 35)
+layout_mode = 2
+texture_normal = ExtResource("4")
+texture_pressed = ExtResource("4")
+texture_hover = ExtResource("4")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Down" type="TextureButton" parent="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(25, 35)
+layout_mode = 2
+texture_normal = ExtResource("3")
+texture_pressed = ExtResource("3")
+texture_hover = ExtResource("3")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="CraftMenuMargin/HSplitContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Button" type="Button" parent="CraftMenuMargin/HSplitContainer/MarginContainer"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_mode = 0
+toggle_mode = true
+script = SubResource("9")
+
+[node name="Popup" type="Popup" parent="CraftMenuMargin/HSplitContainer/MarginContainer"]
+transparent_bg = true
+script = SubResource("10")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup"]
+
+[node name="MarginContainer" type="MarginContainer" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup"]
+custom_minimum_size = Vector2(100, 100)
+offset_right = 100.0
+offset_bottom = 100.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="Panel" type="Panel" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup/MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_wyvmi")
+
+[node name="GridMargin" type="MarginContainer" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup"]
+offset_right = 100.0
+offset_bottom = 100.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="GridContainer" type="GridContainer" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup/GridMargin"]
+layout_mode = 2
+columns = 8
+
+[node name="B1" type="NinePatchRect" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup"]
+material = SubResource("12")
+custom_minimum_size = Vector2(100, 100)
+offset_right = 100.0
+offset_bottom = 100.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("5")
+patch_margin_left = 25
+patch_margin_top = 25
+patch_margin_right = 25
+patch_margin_bottom = 25
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="B2" type="MarginContainer" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup"]
+custom_minimum_size = Vector2(100, 100)
+offset_right = 100.0
+offset_bottom = 100.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="B2" type="NinePatchRect" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup/B2"]
+material = SubResource("14")
+layout_mode = 2
+texture = ExtResource("5")
+patch_margin_left = 25
+patch_margin_top = 25
+patch_margin_right = 25
+patch_margin_bottom = 25
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="B3" type="MarginContainer" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup"]
+custom_minimum_size = Vector2(100, 100)
+offset_right = 100.0
+offset_bottom = 100.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="B3" type="NinePatchRect" parent="CraftMenuMargin/HSplitContainer/MarginContainer/Popup/B3"]
+material = SubResource("16")
+layout_mode = 2
+texture = ExtResource("5")
+patch_margin_left = 25
+patch_margin_top = 25
+patch_margin_right = 25
+patch_margin_bottom = 25
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="CraftMenuMargin/HSplitContainer/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+
+[node name="TextureButton" type="TextureButton" parent="CraftMenuMargin/HSplitContainer/MarginContainer/MarginContainer"]
+material = SubResource("18")
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+toggle_mode = true
+action_mode = 0
+texture_normal = ExtResource("8")
+texture_pressed = ExtResource("7")
+ignore_texture_size = true
+stretch_mode = 5
+script = SubResource("19")
+
+[node name="B1" type="NinePatchRect" parent="."]
+material = SubResource("12")
+layout_mode = 2
+texture = ExtResource("5")
+patch_margin_left = 25
+patch_margin_top = 25
+patch_margin_right = 25
+patch_margin_bottom = 25
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="B2" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="B2" type="NinePatchRect" parent="B2"]
+material = SubResource("14")
+layout_mode = 2
+texture = ExtResource("5")
+patch_margin_left = 25
+patch_margin_top = 25
+patch_margin_right = 25
+patch_margin_bottom = 25
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="B3" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="B3" type="NinePatchRect" parent="B3"]
+material = SubResource("16")
+layout_mode = 2
+texture = ExtResource("5")
+patch_margin_left = 25
+patch_margin_top = 25
+patch_margin_right = 25
+patch_margin_bottom = 25
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[connection signal="pressed" from="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer/VBoxContainer/Up" to="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer/ScrollContainer" method="_on_Up_pressed"]
+[connection signal="pressed" from="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer/VBoxContainer/Down" to="CraftMenuMargin/HSplitContainer/HSplitContainer/MarginContainer/HBoxContainer/ScrollContainer" method="_on_Down_pressed"]
+[connection signal="toggled" from="CraftMenuMargin/HSplitContainer/MarginContainer/Button" to="CraftMenuMargin/HSplitContainer/MarginContainer/Button" method="_on_Button_toggled"]
+[connection signal="about_to_popup" from="CraftMenuMargin/HSplitContainer/MarginContainer/Popup" to="CraftMenuMargin/HSplitContainer/MarginContainer/Popup" method="_on_Popup_about_to_show"]
+[connection signal="popup_hide" from="CraftMenuMargin/HSplitContainer/MarginContainer/Popup" to="CraftMenuMargin/HSplitContainer/MarginContainer/Popup" method="_on_Popup_popup_hide"]
+[connection signal="toggled" from="CraftMenuMargin/HSplitContainer/MarginContainer/MarginContainer/TextureButton" to="CraftMenuMargin/HSplitContainer/MarginContainer/MarginContainer/TextureButton" method="_on_TextureButton_toggled"]

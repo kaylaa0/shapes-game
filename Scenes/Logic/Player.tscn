@@ -1,0 +1,87 @@
+[gd_scene load_steps=8 format=3 uid="uid://ccnvgmbyrv8sr"]
+
+[ext_resource type="Script" path="res://Scripts/Logic/Player.gd" id="1_mb47y"]
+[ext_resource type="Script" path="res://Scripts/Nodes/AdvancedCamera2D.gd" id="2_uxk76"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_i1o1g"]
+properties/0/path = NodePath(".:jumping")
+properties/0/spawn = true
+properties/0/sync = true
+
+[sub_resource type="GDScript" id="GDScript_idy7o"]
+resource_name = "PlayerInput"
+script/source = "extends MultiplayerSynchronizer
+
+# Set via RPC to simulate is_action_just_pressed.
+@export var jumping := false
+
+# Synchronized property.
+@export var direction := Vector2()
+
+func _ready():
+	# Only process for the local player
+	set_process(get_multiplayer_authority() == multiplayer.get_unique_id())
+
+
+@rpc(\"call_local\")
+func jump():
+	jumping = true
+
+func _process(delta):
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	if Input.is_action_just_pressed(\"move_up\"):
+		print(multiplayer.get_instance_id())
+		direction = Vector2(-5,0)
+	if Input.is_action_just_pressed(\"move_down\"):
+		print(multiplayer.get_instance_id())
+		direction = Vector2(5,0)
+		#jump.rpc()
+"
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_1swrw"]
+properties/0/path = NodePath(".:gold")
+properties/0/spawn = true
+properties/0/sync = true
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_wgamr"]
+properties/0/path = NodePath(".:playerID")
+properties/0/spawn = true
+properties/0/sync = true
+properties/1/path = NodePath(".:userData")
+properties/1/spawn = true
+properties/1/sync = true
+
+[sub_resource type="GDScript" id="GDScript_62xd5"]
+resource_name = "ServerToPeer"
+script/source = "extends MultiplayerSynchronizer
+
+
+func _ready():
+	# Only process for the local player
+	set_process(1 == multiplayer.get_unique_id())
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[node name="Player" type="Node2D"]
+process_mode = 3
+script = ExtResource("1_mb47y")
+
+[node name="playerCamera" type="Camera2D" parent="."]
+script = ExtResource("2_uxk76")
+
+[node name="PlayerInput" type="MultiplayerSynchronizer" parent="."]
+root_path = NodePath(".")
+replication_config = SubResource("SceneReplicationConfig_i1o1g")
+script = SubResource("GDScript_idy7o")
+
+[node name="ServerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_1swrw")
+
+[node name="ServerToPeerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_wgamr")
+script = SubResource("GDScript_62xd5")

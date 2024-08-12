@@ -1,0 +1,237 @@
+[gd_scene load_steps=15 format=3 uid="uid://biy37bbwkq4aj"]
+
+[ext_resource type="Script" path="res://Scripts/UI/HUD/SummonButton.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://c150c6wunx7fs" path="res://Textures/main/circle.png" id="2"]
+[ext_resource type="BitMap" uid="uid://ci3p33lcq1p2" path="res://Textures/main/bitmap/circle.png" id="3"]
+[ext_resource type="PackedScene" uid="uid://b747yunphdydu" path="res://Scenes/UI/HUD/AnimatedNinePatch.tscn" id="5"]
+
+[sub_resource type="Animation" id="1"]
+resource_name = "Button Focused"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SummonMenu:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SummonMenu:size")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(120, 120)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ml4tn"]
+_data = {
+"Button Focused": SubResource("1")
+}
+
+[sub_resource type="Shader" id="2"]
+code = "shader_type canvas_item;
+
+uniform vec4 u_replacement_color : source_color;
+
+void fragment() {
+    COLOR = u_replacement_color;
+}"
+
+[sub_resource type="ShaderMaterial" id="3"]
+shader = SubResource("2")
+shader_parameter/u_replacement_color = Color(0.282353, 0.317647, 0.156863, 0)
+
+[sub_resource type="Shader" id="4"]
+code = "shader_type canvas_item;
+
+// Which color you want to change
+uniform vec4 u_color_key : source_color;
+// Which color to replace it with
+uniform vec4 u_replacement_color : source_color;
+// How much tolerance for the replacement color (between 0 and 1)
+uniform float u_tolerance;
+
+void fragment() {
+    // Get color from the sprite texture at the current pixel we are rendering
+    vec4 original_color = texture(TEXTURE, UV);
+    vec3 col = original_color.rgb;
+    // Get a rough degree of difference between the texture color and the color key
+    vec3 diff3 = col - u_color_key.rgb;
+    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+    float brightness = length(col);
+    col = mix(col, u_replacement_color.rgb * brightness, step(m, u_tolerance));
+    // Assign final color for the pixel, and preserve transparency
+    COLOR = vec4(col.rgb, original_color.a);
+}"
+
+[sub_resource type="ShaderMaterial" id="5"]
+shader = SubResource("4")
+shader_parameter/u_color_key = Color(1, 1, 1, 1)
+shader_parameter/u_replacement_color = Color(0.458824, 0.737255, 0.317647, 1)
+shader_parameter/u_tolerance = null
+
+[sub_resource type="Shader" id="6"]
+code = "shader_type canvas_item;
+
+// Which color you want to change
+uniform vec4 u_color_key : source_color;
+// Which color to replace it with
+uniform vec4 u_replacement_color : source_color;
+// How much tolerance for the replacement color (between 0 and 1)
+uniform float u_tolerance;
+
+void fragment() {
+    // Get color from the sprite texture at the current pixel we are rendering
+    vec4 original_color = texture(TEXTURE, UV);
+    vec3 col = original_color.rgb;
+    // Get a rough degree of difference between the texture color and the color key
+    vec3 diff3 = col - u_color_key.rgb;
+    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+    float brightness = length(col);
+    col = mix(col, u_replacement_color.rgb * brightness, step(m, u_tolerance));
+    // Assign final color for the pixel, and preserve transparency
+    COLOR = vec4(col.rgb, original_color.a);
+}"
+
+[sub_resource type="ShaderMaterial" id="7"]
+shader = SubResource("6")
+shader_parameter/u_color_key = Color(1, 1, 1, 1)
+shader_parameter/u_replacement_color = Color(0.341176, 0.423529, 0.662745, 0)
+shader_parameter/u_tolerance = null
+
+[sub_resource type="Shader" id="8"]
+code = "shader_type canvas_item;
+
+// Which color you want to change
+uniform vec4 u_color_key : source_color;
+// Which color to replace it with
+uniform vec4 u_replacement_color : source_color;
+// How much tolerance for the replacement color (between 0 and 1)
+uniform float u_tolerance;
+
+void fragment() {
+    // Get color from the sprite texture at the current pixel we are rendering
+    vec4 original_color = texture(TEXTURE, UV);
+    vec3 col = original_color.rgb;
+    // Get a rough degree of difference between the texture color and the color key
+    vec3 diff3 = col - u_color_key.rgb;
+    float m = max(max(abs(diff3.r), abs(diff3.g)), abs(diff3.b));
+    // Change color of pixels below tolerance threshold, while keeping shades if any (a bit naive, there may better ways)
+    float brightness = length(col);
+    col = mix(col, u_replacement_color.rgb * brightness, step(m, u_tolerance));
+    // Assign final color for the pixel, and preserve transparency
+    COLOR = vec4(col.rgb, original_color.a);
+}"
+
+[sub_resource type="ShaderMaterial" id="9"]
+shader = SubResource("8")
+shader_parameter/u_color_key = Color(1, 1, 1, 1)
+shader_parameter/u_replacement_color = Color(0.639216, 0.662745, 0.341176, 0)
+shader_parameter/u_tolerance = null
+
+[node name="SummonButton" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_ml4tn")
+}
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = -2
+material = SubResource("3")
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("2")
+
+[node name="B1" type="Sprite2D" parent="Sprite2D"]
+material = SubResource("5")
+texture = ExtResource("2")
+
+[node name="B2" type="Sprite2D" parent="Sprite2D"]
+material = SubResource("7")
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("2")
+
+[node name="B3" type="Sprite2D" parent="Sprite2D"]
+material = SubResource("9")
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("2")
+
+[node name="GridContainer" type="GridContainer" parent="Sprite2D"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -250.0
+offset_right = -250.0
+offset_bottom = -250.0
+columns = 2
+
+[node name="TL" type="Control" parent="Sprite2D/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TR" type="Control" parent="Sprite2D/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TextureButton" type="TextureButton" parent="Sprite2D/GridContainer/TR"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 25.0
+offset_top = -173.0
+offset_right = 175.0
+offset_bottom = -23.0
+grow_horizontal = 0
+pivot_offset = Vector2(75, 75)
+texture_normal = ExtResource("2")
+texture_click_mask = ExtResource("3")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="BL" type="Control" parent="Sprite2D/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BR" type="Control" parent="Sprite2D/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SummonMenu" type="Control" parent="."]
+custom_minimum_size = Vector2(120, 120)
+anchors_preset = 0
+offset_left = 22.0
+offset_top = -140.0
+offset_right = 142.0
+offset_bottom = -20.0
+pivot_offset = Vector2(0, 60)
+
+[node name="AnimatedNinePatch" parent="SummonMenu" instance=ExtResource("5")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 120.0
+offset_bottom = 120.0
+grow_horizontal = 1
+grow_vertical = 1
+isSummonButton = true

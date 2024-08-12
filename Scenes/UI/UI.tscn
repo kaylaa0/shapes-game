@@ -1,0 +1,228 @@
+[gd_scene load_steps=11 format=3 uid="uid://d2c067nhoxo2j"]
+
+[ext_resource type="Script" path="res://Scripts/UI/UI.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://biy37bbwkq4aj" path="res://Scenes/UI/HUD/SummonButton.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/HUD/Minimap.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/HUD/PlayerData.tscn" id="6"]
+[ext_resource type="Script" path="res://Scripts/UI/Pause/Buttons/QuitTitle.gd" id="7"]
+[ext_resource type="Script" path="res://Scripts/UI/Pause/Buttons/QuitDesktop.gd" id="8"]
+[ext_resource type="Script" path="res://Scripts/UI/Pause/Popups/ExitGameConfirm.gd" id="9"]
+[ext_resource type="Script" path="res://Scripts/UI/Pause/Popups/MainMenuConfirm.gd" id="10"]
+[ext_resource type="PackedScene" uid="uid://bg7ecar0qu5j1" path="res://Scenes/UI/HUD/CraftMenu.tscn" id="11"]
+[ext_resource type="Script" path="res://Scripts/UI/Pause/Buttons/Resume.gd" id="12"]
+
+[node name="Interface" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="HUD" type="Control" parent="."]
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/HBoxContainer"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control4" type="Control" parent="HUD/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PlayerData" parent="HUD/HBoxContainer/VBoxContainer/Control4" instance=ExtResource("6")]
+anchors_preset = 0
+
+[node name="Control5" type="Control" parent="HUD/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 600)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control6" type="Control" parent="HUD/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="HUD/HBoxContainer/VBoxContainer/Control6"]
+layer = 2
+
+[node name="SummonButton" parent="HUD/HBoxContainer/VBoxContainer/Control6/CanvasLayer" instance=ExtResource("4")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = 8.0
+offset_bottom = 8.0
+grow_vertical = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="HUD/HBoxContainer"]
+custom_minimum_size = Vector2(1000, 0)
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Control" type="Control" parent="HUD/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control2" type="Control" parent="HUD/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 600)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control3" type="Control" parent="HUD/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="HUD/HBoxContainer/VBoxContainer2/Control3"]
+
+[node name="CraftMenu" parent="HUD/HBoxContainer/VBoxContainer2/Control3/CanvasLayer" instance=ExtResource("11")]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = 373.0
+offset_right = 376.0
+offset_bottom = 563.0
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="HUD/HBoxContainer"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control2" type="Control" parent="HUD/HBoxContainer/VBoxContainer3"]
+custom_minimum_size = Vector2(0, 840)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Control3" type="Control" parent="HUD/HBoxContainer/VBoxContainer3"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Minimap" parent="HUD/HBoxContainer/VBoxContainer3/Control3" instance=ExtResource("5")]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 0.0
+offset_bottom = 0.0
+
+[node name="Pause" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Pause"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 607.0
+offset_top = 307.0
+offset_right = -607.0
+offset_bottom = -307.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Pause/VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "PAUSED"
+
+[node name="PanelContainer" type="PanelContainer" parent="Pause/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Pause/VBoxContainer/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LeftMargin" type="Control" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TopMargin" type="Control" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="Resume" type="Button" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Resume"
+script = ExtResource("12")
+
+[node name="Save" type="Button" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Save"
+
+[node name="Load" type="Button" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Load"
+
+[node name="Options" type="Button" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Options"
+
+[node name="Settings" type="Button" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Settings"
+
+[node name="QuitTitle" type="Button" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Quit To Main Menu"
+script = ExtResource("7")
+
+[node name="QuitDesktop" type="Button" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Quit To Desktop"
+script = ExtResource("8")
+
+[node name="RightMargin" type="Control" parent="Pause/VBoxContainer/PanelContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainMenuConfirm" type="ConfirmationDialog" parent="."]
+dialog_text = "If you go to main menu now, your unsaved game will be lost.
+     You should save the game before going to main menu."
+dialog_hide_on_ok = false
+script = ExtResource("10")
+
+[node name="ExitGameConfirm" type="ConfirmationDialog" parent="."]
+dialog_text = "   If you quit the game now, your unsaved game will be lost.
+       You should save the game before quitting the game."
+dialog_hide_on_ok = false
+script = ExtResource("9")
+
+[connection signal="pressed" from="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer/Resume" to="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer/Resume" method="_on_Resume_pressed"]
+[connection signal="pressed" from="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer/QuitTitle" to="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer/QuitTitle" method="_on_QuitTitle_pressed"]
+[connection signal="pressed" from="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer/QuitDesktop" to="Pause/VBoxContainer/PanelContainer/HBoxContainer/VBoxContainer/QuitDesktop" method="_on_QuitDesktop_pressed"]

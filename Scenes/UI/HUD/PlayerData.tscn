@@ -1,0 +1,140 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Textures/objects/icon.png" type="Texture2D" id=1]
+[ext_resource path="res://Textures/main/circle.png" type="Texture2D" id=2]
+
+[sub_resource type="CanvasItemMaterial" id=1]
+light_mode = 2
+
+[node name="PlayerData" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1520.0
+offset_bottom = -930.0
+custom_minimum_size = Vector2( 400, 150 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSplitContainer" type="VSplitContainer" parent="PanelContainer"]
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 393.0
+offset_bottom = 143.0
+custom_constants/separation = 0
+split_offset = 100
+dragger_visibility = 1
+
+[node name="UserData" type="Control" parent="PanelContainer/VSplitContainer"]
+offset_right = 386.0
+offset_bottom = 100.0
+
+[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/VSplitContainer/UserData"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+split_offset = 100
+dragger_visibility = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ProfilePicture" type="Control" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer"]
+offset_right = 100.0
+offset_bottom = 100.0
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/ProfilePicture"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource( 2 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/ProfilePicture"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/offset_right = 10
+custom_constants/offset_top = 10
+custom_constants/offset_left = 10
+custom_constants/offset_bottom = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/ProfilePicture/MarginContainer"]
+material = SubResource( 1 )
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 90.0
+offset_bottom = 90.0
+texture = ExtResource( 1 )
+expand = true
+
+[node name="PointLight2D" type="PointLight2D" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/ProfilePicture/MarginContainer"]
+position = Vector2( 50, 50 )
+scale = Vector2( 0.16, 0.16 )
+texture = ExtResource( 2 )
+mode = 2
+
+[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer"]
+offset_left = 112.0
+offset_right = 386.0
+offset_bottom = 100.0
+split_offset = 150
+dragger_visibility = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="UserCard" type="Control" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/HSplitContainer"]
+offset_right = 150.0
+offset_bottom = 100.0
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/HSplitContainer/UserCard"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/offset_top = 15
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSplitContainer" type="VSplitContainer" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/HSplitContainer/UserCard/MarginContainer"]
+offset_top = 15.0
+offset_right = 150.0
+offset_bottom = 100.0
+split_offset = 25
+dragger_visibility = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NickName" type="RichTextLabel" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/HSplitContainer/UserCard/MarginContainer/VSplitContainer"]
+offset_right = 150.0
+offset_bottom = 25.0
+text = "Nickname"
+scroll_active = false
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/HSplitContainer/UserCard/MarginContainer/VSplitContainer"]
+offset_top = 37.0
+offset_right = 150.0
+offset_bottom = 85.0
+scroll_active = false
+
+[node name="Team" type="Control" parent="PanelContainer/VSplitContainer/UserData/HSplitContainer/HSplitContainer"]
+offset_left = 162.0
+offset_right = 274.0
+offset_bottom = 100.0
+
+[node name="GameData" type="Control" parent="PanelContainer/VSplitContainer"]
+offset_top = 108.0
+offset_right = 386.0
+offset_bottom = 136.0

@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Textures/objects/icon.png" type="Texture2D" id=1]
+[ext_resource path="res://Scripts/Objects/Shapes/Triangle.gd" type="Script" id=2]
+[ext_resource path="res://Scripts/Objects/RotationDisable.gd" type="Script" id=3]
+
+[sub_resource type="PhysicsMaterial" id=1]
+friction = 0.5
+
+[sub_resource type="SpriteFrames" id=2]
+animations = [ {
+"frames": [  ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[node name="Triangle" type="RigidBody2D" groups=[
+"shape",
+"triangle",
+]]
+input_pickable = true
+mass = 4.0
+physics_material_override = SubResource( 1 )
+script = ExtResource( 2 )
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+frames = SubResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array( 25, 25, -25, 25, 0, -25 )
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+texture = ExtResource( 1 )
+texture_offset = Vector2( 25, 25 )
+polygon = PackedVector2Array( 25, 25, -25, 25, 0, -25 )
+
+[node name="GroundCast" type="RayCast2D" parent="."]
+enabled = true
+target_position = Vector2( 0, 26 )
+collision_mask = 32768
+script = ExtResource( 3 )
+
+[node name="RightCast" type="RayCast2D" parent="."]
+enabled = true
+target_position = Vector2( 26, 0 )
+collision_mask = 32768
+script = ExtResource( 3 )
+
+[node name="LeftCast" type="RayCast2D" parent="."]
+enabled = true
+target_position = Vector2( -26, 0 )
+collision_mask = 32768
+script = ExtResource( 3 )

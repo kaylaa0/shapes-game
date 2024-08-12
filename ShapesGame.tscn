@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bm1pgkjevtuwj"]
+
+[ext_resource type="PackedScene" uid="uid://bmkldwg0munhd" path="res://Scenes/UI/MainMenu.tscn" id="1_jh3pl"]
+
+[node name="ShapesGame" type="Node"]
+
+[node name="Level" type="Node" parent="."]
+
+[node name="LevelSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://Scenes/Maps/MeadowCastle.tscn")
+spawn_path = NodePath("../Level")
+spawn_limit = 1
+
+[node name="GameMenu" parent="." instance=ExtResource("1_jh3pl")]

@@ -1,0 +1,718 @@
+[gd_scene load_steps=22 format=3 uid="uid://bmkldwg0munhd"]
+
+[ext_resource type="Texture2D" uid="uid://bn8ddqt5nl0kl" path="res://Textures/ui/social/discord.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://dcy6h1ne5a2w5" path="res://Textures/logo.png" id="2"]
+[ext_resource type="VideoStream" path="res://Videos/main_menu_video.ogv" id="2_rk1nc"]
+[ext_resource type="Texture2D" uid="uid://kwd4pogfp6yi" path="res://Textures/ui/objects/selectMenuArrow.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://b7jd0748ntp7c" path="res://Textures/objects/icon.png" id="4"]
+[ext_resource type="Script" path="res://Scripts/UI/Main Menu/Buttons/SinglePlayer.gd" id="5"]
+[ext_resource type="Script" path="res://Scripts/UI/Main Menu/Buttons/SPMStartButton.gd" id="6"]
+[ext_resource type="Script" path="res://Scripts/UI/Main Menu/Buttons/SPMBackButton.gd" id="8"]
+[ext_resource type="Script" path="res://Scripts/UI/Main Menu/GameMenu.gd" id="9"]
+[ext_resource type="Script" path="res://Scripts/UI/Main Menu/MainMenuVideoPlayer.gd" id="10"]
+[ext_resource type="Script" path="res://Scripts/UI/Main Menu/SinglePlayer.gd" id="11"]
+[ext_resource type="BitMap" path="res://Textures/ui/social/discordbm.png" id="12"]
+
+[sub_resource type="GDScript" id="GDScript_ube2u"]
+script/source = "extends Button
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+
+func _on_pressed():
+	get_owner().get_node(\"MainMenu\").hide()
+	get_owner().get_node(\"MultiPlayer\").show()
+	MultiplayerHandler.set_is_multiplayer(true)
+	pass # Replace with function body.
+"
+
+[sub_resource type="GDScript" id="GDScript_mjp4v"]
+script/source = "extends MenuButton
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	for map in MapManager.mapNames:
+		get_popup().add_item(map)
+# warning-ignore:return_value_discarded
+	get_popup().connect(\"id_pressed\",Callable(self,\"_on_item_pressed\"))
+	if GameManager.debug:
+		get_owner().get_node(\"SinglePlayer\").setSelectedMap(GameManager.debugMap)
+	pass # Replace with function body.
+
+func _on_item_pressed(id):
+	set_text(get_popup().get_item_text(id))
+	get_owner().get_node(\"SinglePlayer\").setSelectedMap(get_popup().get_item_text(id))
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+"
+
+[sub_resource type="GDScript" id="GDScript_0cwps"]
+script/source = "extends Control
+
+var selectedMap = null
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+		pass # Replace with function body.
+
+func setSelectedMap(map):
+	GameManager.selectedScene = \"res://Scenes/Maps/\"+str(map)+\".tscn\"
+	selectedMap = map
+
+func getSelectedMap():
+	return selectedMap
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+
+
+func _on_host_check_button_toggled(button_pressed):
+	if button_pressed:
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortHostLabel\").show()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortHost\").show()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IPAdressLabel\").hide()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IPAdress\").hide()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortAdressLabel\").hide()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortAdress\").hide()
+	else:
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortHostLabel\").hide()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortHost\").hide()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IPAdressLabel\").show()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IPAdress\").show()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortAdressLabel\").show()
+		get_node(\"../MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortAdress\").show()
+	pass # Replace with function body.
+"
+
+[sub_resource type="GDScript" id="GDScript_uddi4"]
+script/source = "extends MenuButton
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	for map in MapManager.mapNames:
+		get_popup().add_item(map)
+# warning-ignore:return_value_discarded
+	get_popup().connect(\"id_pressed\",Callable(self,\"_on_item_pressed\"))
+	if GameManager.debug:
+		get_owner().get_node(\"MultiPlayer\").setSelectedMap(GameManager.debugMap)
+	pass # Replace with function body.
+
+func _on_item_pressed(id):
+	set_text(get_popup().get_item_text(id))
+	get_owner().get_node(\"MultiPlayer\").setSelectedMap(get_popup().get_item_text(id))
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+"
+
+[sub_resource type="GDScript" id="GDScript_6mce0"]
+script/source = "extends Label
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+
+func _update_ip():
+	set_text(MultiplayerHandler.get_ip_adress())
+	pass # Replace with function body.
+"
+
+[sub_resource type="GDScript" id="GDScript_7qc01"]
+resource_local_to_scene = true
+script/source = "extends LineEdit
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	if GameManager.debug:
+		set_text(GameManager.defaultPort)
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+
+func _on_text_changed(new_text):
+	var temp = MultiplayerHandler.port_regex.search(get_text())
+	var caret = get_caret_column()
+	if temp:
+		set_text(temp.get_string(0))
+		set_caret_column(caret)
+	else:
+		set_text(get_text().left(-1))
+		set_caret_column(caret-1)
+	pass # Replace with function body.
+"
+
+[sub_resource type="GDScript" id="GDScript_rxj18"]
+script/source = "extends LineEdit
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	if GameManager.debug:
+		set_text(GameManager.defaultIP)
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+
+
+func _on_text_changed(new_text):
+	var temp = MultiplayerHandler.number_dot_regex.search(get_text())
+	var caret = get_caret_column()
+	if temp:
+		set_text(temp.get_string(0))
+		set_caret_column(caret)
+	else:
+		set_text(get_text().left(-1))
+		set_caret_column(caret-1)
+	pass # Replace with function body.
+"
+
+[sub_resource type="GDScript" id="GDScript_n0vjj"]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+
+
+func _on_BackButton_pressed():
+	get_owner().get_node(\"MainMenu\").show()
+	get_owner().get_node(\"MultiPlayer\").hide()
+	
+	pass # Replace with function body.
+"
+
+[sub_resource type="GDScript" id="GDScript_der3w"]
+script/source = "extends Button
+
+
+func _ready():
+	pass 
+
+#func _process(delta):
+#	pass
+
+
+func _on_StartButton_pressed():
+	if get_owner().get_node(\"MultiPlayer\").getSelectedMap() != null:
+		if $\"../../CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/CheckButton\".is_pressed():
+			# Host
+			var port_check = MultiplayerHandler.port_regex.search($\"../../CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortHost\".text)
+			if port_check:
+				MultiplayerHandler.create_server(int(port_check.get_string(0)))
+			else:
+				get_owner().get_node(\"InvalidPort\").popup()
+		else:
+			# Client
+			var ip_check = MultiplayerHandler.ip_regex.search($\"../../CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IPAdress\".text)
+			var port_check = MultiplayerHandler.port_regex.search($\"../../CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortAdress\".text)
+			if ip_check:
+				var ip = ip_check.get_string(0)
+				if port_check:
+					MultiplayerHandler.create_client(ip, int(port_check.get_string(0)))
+				else:
+					get_owner().get_node(\"InvalidPort\").popup()
+			else:
+				get_owner().get_node(\"InvalidIP\").popup()
+		# warning-ignore:return_value_discarded
+	else:
+		get_owner().get_node(\"SPMNoMapSelected\").popup()
+"
+
+[node name="GameMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("9")
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+stream = ExtResource("2_rk1nc")
+volume_db = -20.0
+script = ExtResource("10")
+
+[node name="MainMenu" type="Control" parent="."]
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Title" type="HBoxContainer" parent="MainMenu/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+alignment = 1
+
+[node name="Logo" type="TextureRect" parent="MainMenu/HBoxContainer/VBoxContainer/Title"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Menu" type="HBoxContainer" parent="MainMenu/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+alignment = 1
+
+[node name="Game" type="VBoxContainer" parent="MainMenu/HBoxContainer/VBoxContainer/Menu"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="SinglePlayer" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Game"]
+custom_minimum_size = Vector2(100, 85)
+layout_mode = 2
+text = "Single Player"
+flat = true
+script = ExtResource("5")
+
+[node name="MultiPlayer" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Game"]
+custom_minimum_size = Vector2(100, 85)
+layout_mode = 2
+text = "Multi Player"
+flat = true
+script = SubResource("GDScript_ube2u")
+
+[node name="Options" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Game"]
+custom_minimum_size = Vector2(100, 85)
+layout_mode = 2
+text = "Options"
+flat = true
+
+[node name="VSeparator" type="VSeparator" parent="MainMenu/HBoxContainer/VBoxContainer/Menu"]
+layout_mode = 2
+
+[node name="Right" type="HBoxContainer" parent="MainMenu/HBoxContainer/VBoxContainer/Menu"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right"]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+columns = 2
+
+[node name="Skins" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer/Skins"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Skins2" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer/Skins2"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Shop" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer/Shop"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Scores2" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Menu/Right/GridContainer/Scores2"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Bottom" type="HBoxContainer" parent="MainMenu/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="TextureButton" type="TextureButton" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+texture_normal = ExtResource("1")
+texture_click_mask = ExtResource("12")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Settings" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom"]
+layout_mode = 2
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom/Settings"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Patreon" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom"]
+layout_mode = 2
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom/Patreon"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Discord" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom"]
+layout_mode = 2
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom/Discord"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Twitter" type="Button" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom"]
+layout_mode = 2
+icon = ExtResource("4")
+
+[node name="Label" type="Label" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom/Twitter"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="BMargin" type="Control" parent="MainMenu/HBoxContainer/VBoxContainer/Bottom"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="SinglePlayer" type="Control" parent="." groups=["menu"]]
+visible = false
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("11")
+
+[node name="MarginContainer" type="MarginContainer" parent="SinglePlayer"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = 100.0
+offset_right = -100.0
+offset_bottom = -100.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SinglePlayer/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="SinglePlayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer"]
+custom_minimum_size = Vector2(1000, 500)
+layout_mode = 2
+
+[node name="SceneSelection" type="HBoxContainer" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/SceneSelection"]
+custom_minimum_size = Vector2(500, 50)
+layout_mode = 2
+
+[node name="MenuButton" type="MenuButton" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/SceneSelection/MarginContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "..."
+script = SubResource("GDScript_mjp4v")
+
+[node name="TextureRect" type="TextureRect" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/SceneSelection/MarginContainer/MenuButton"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -50.0
+size_flags_vertical = 3
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GridContainer2" type="GridContainer" parent="SinglePlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SinglePlayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="BackButton" type="Button" parent="SinglePlayer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Back"
+script = ExtResource("8")
+
+[node name="StartButton" type="Button" parent="SinglePlayer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Start Game"
+script = ExtResource("6")
+
+[node name="MultiPlayer" type="Control" parent="." groups=["menu"]]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = SubResource("GDScript_0cwps")
+
+[node name="MarginContainer" type="MarginContainer" parent="MultiPlayer"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = 100.0
+offset_right = -100.0
+offset_bottom = -100.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MultiPlayer/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="MultiPlayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer"]
+custom_minimum_size = Vector2(1000, 500)
+layout_mode = 2
+
+[node name="SceneSelection" type="HBoxContainer" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/SceneSelection"]
+custom_minimum_size = Vector2(500, 50)
+layout_mode = 2
+
+[node name="MenuButton" type="MenuButton" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/SceneSelection/MarginContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "..."
+script = SubResource("GDScript_uddi4")
+
+[node name="TextureRect" type="TextureRect" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/SceneSelection/MarginContainer/MenuButton"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -50.0
+size_flags_vertical = 3
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="IPLabel" type="Label" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+layout_mode = 2
+text = "Your Local IP Adress:"
+
+[node name="IP" type="Label" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+layout_mode = 2
+script = SubResource("GDScript_6mce0")
+
+[node name="CheckButton" type="CheckButton" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+layout_mode = 2
+text = "Host"
+
+[node name="PortHostLabel" type="Label" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Port to Host:"
+
+[node name="PortHost" type="LineEdit" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+script = SubResource("GDScript_7qc01")
+
+[node name="IPAdressLabel" type="Label" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+layout_mode = 2
+text = "Adress to Connect:"
+
+[node name="IPAdress" type="LineEdit" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+layout_mode = 2
+script = SubResource("GDScript_rxj18")
+
+[node name="PortAdressLabel" type="Label" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+layout_mode = 2
+text = "Port to Connect:"
+
+[node name="PortAdress" type="LineEdit" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer"]
+layout_mode = 2
+script = SubResource("GDScript_7qc01")
+
+[node name="GridContainer2" type="GridContainer" parent="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MultiPlayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="BackButton" type="Button" parent="MultiPlayer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Back"
+script = SubResource("GDScript_n0vjj")
+
+[node name="StartButton" type="Button" parent="MultiPlayer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Start Game"
+script = SubResource("GDScript_der3w")
+
+[node name="InvalidPort" type="AcceptDialog" parent="."]
+size = Vector2i(242, 100)
+dialog_text = "Port is invalid!"
+
+[node name="InvalidIP" type="AcceptDialog" parent="."]
+size = Vector2i(242, 100)
+dialog_text = "IP adress is invalid!"
+
+[node name="SPMNoMapSelected" type="AcceptDialog" parent="."]
+size = Vector2i(242, 100)
+dialog_text = "You have not selected a map!"
+
+[connection signal="finished" from="VideoStreamPlayer" to="VideoStreamPlayer" method="_on_VideoPlayer_finished"]
+[connection signal="pressed" from="MainMenu/HBoxContainer/VBoxContainer/Menu/Game/SinglePlayer" to="MainMenu/HBoxContainer/VBoxContainer/Menu/Game/SinglePlayer" method="_on_SinglePlayer_pressed"]
+[connection signal="pressed" from="MainMenu/HBoxContainer/VBoxContainer/Menu/Game/MultiPlayer" to="MainMenu/HBoxContainer/VBoxContainer/Menu/Game/MultiPlayer" method="_on_pressed"]
+[connection signal="pressed" from="SinglePlayer/MarginContainer/VBoxContainer/HBoxContainer/BackButton" to="SinglePlayer/MarginContainer/VBoxContainer/HBoxContainer/BackButton" method="_on_BackButton_pressed"]
+[connection signal="pressed" from="SinglePlayer/MarginContainer/VBoxContainer/HBoxContainer/StartButton" to="SinglePlayer/MarginContainer/VBoxContainer/HBoxContainer/StartButton" method="_on_StartButton_pressed"]
+[connection signal="ready" from="MultiPlayer" to="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IP" method="_update_ip"]
+[connection signal="toggled" from="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/CheckButton" to="MultiPlayer" method="_on_host_check_button_toggled"]
+[connection signal="text_changed" from="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortHost" to="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortHost" method="_on_text_changed"]
+[connection signal="text_changed" from="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IPAdress" to="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/IPAdress" method="_on_text_changed"]
+[connection signal="text_changed" from="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortAdress" to="MultiPlayer/MarginContainer/VBoxContainer/CenterContainer/VBoxContainer/HBoxContainer/GridContainer/VBoxContainer/PortAdress" method="_on_text_changed"]
+[connection signal="pressed" from="MultiPlayer/MarginContainer/VBoxContainer/HBoxContainer/BackButton" to="MultiPlayer/MarginContainer/VBoxContainer/HBoxContainer/BackButton" method="_on_BackButton_pressed"]
+[connection signal="pressed" from="MultiPlayer/MarginContainer/VBoxContainer/HBoxContainer/StartButton" to="MultiPlayer/MarginContainer/VBoxContainer/HBoxContainer/StartButton" method="_on_StartButton_pressed"]

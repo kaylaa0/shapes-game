@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://c77doycvodyfr"]
+
+[ext_resource type="Texture2D" uid="uid://b7jd0748ntp7c" path="res://Textures/objects/icon.png" id="1_7tcwc"]
+
+[sub_resource type="GDScript" id="1"]
+script/source = "extends \"res://Scripts/Objects/Craftables/Basic.gd\"
+
+var dummyBuilding = load(\"res://Scenes/Objects/Craftables/Buildings/BuildingSummonTotem.tscn\").instantiate()
+
+func _init():
+	self.set_recipe({\"Square\":0, \"Triangle\": 0, \"Circle\": 1})
+	init_building(dummyBuilding)
+	self.set_building_version(dummyBuilding)
+
+func _ready():
+	pass
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+
+
+"
+
+[node name="BasicSummonTotem" type="Node2D"]
+script = SubResource("1")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_7tcwc")

@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://b747yunphdydu"]
+
+[ext_resource type="Texture2D" uid="uid://yshtls6wu6h" path="res://Textures/ui/objects/circle 120x120.png" id="1"]
+[ext_resource type="Script" path="res://Scripts/UI/HUD/AnimatedNinePatch.gd" id="2"]
+
+[node name="AnimatedNinePatch" type="Control"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1800.0
+offset_bottom = -960.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+clip_contents = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+texture = ExtResource("1")
+patch_margin_left = 60
+patch_margin_top = 60
+patch_margin_right = 60
+patch_margin_bottom = 60
+
+[connection signal="resized" from="." to="." method="_on_AnimatedNinePatch_resized"]
